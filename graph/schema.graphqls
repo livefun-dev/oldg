@@ -5,3 +5,23 @@
 type Query {
   hello(name: String): String!
 }
+
+type Mutation {
+  pinMessage(msg: String!, author: String!): Boolean!
+  unpin: Boolean!
+}
+
+type Subscription {
+  commands: Command!
+}
+
+type PinMessage {
+  msg: String!
+  author: String!
+}
+
+type Unpin {
+  b: Boolean
+}
+
+union Command = PinMessage | Unpin
