@@ -46,6 +46,7 @@ func (r *subscriptionResolver) Commands(ctx context.Context) (<-chan model.Comma
 
 	go func() {
 		<-ctx.Done() // subscription cancellata
+		close(observers[id].msgChan)
 		delete(observers, id)
 		fmt.Printf("Subscription delete: %s\n", id)
 	}()
