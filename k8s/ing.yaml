@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -13,8 +13,10 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: oldg
-              servicePort: 8080
+              service:
+                name: oldg
+                port:
+                  number: 8080
             path: /
             pathType: Prefix
   tls:
