@@ -15,7 +15,7 @@ spec:
         app: oldg
     spec:
       containers:
-        - image: ghcr.io/livefun-dev/oldg:9a80f4c1add64542149b2028c35690c64437acb9
+        - image: ghcr.io/livefun-dev/oldg:b229766535f65ba10e2625b3d758813ab5a93898
           name: oldg
           ports:
             - containerPort: 8080

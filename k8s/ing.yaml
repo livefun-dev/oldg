@@ -9,7 +9,7 @@ metadata:
   namespace: oldg
 spec:
   rules:
-    - host: olg.dev.ludusrusso.space
+    - host: oldg.dev.ludusrusso.space
       http:
         paths:
           - backend:
@@ -19,5 +19,5 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - olg.dev.ludusrusso.space
-      secretName: olg.dev.ludusrusso.space-tls
+        - oldg.dev.ludusrusso.space
+      secretName: oldg.dev.ludusrusso.space-tls
