@@ -6,6 +6,11 @@ type Command interface {
 	IsCommand()
 }
 
+type ChatMessage struct {
+	Msg    string `json:"msg"`
+	Author string `json:"author"`
+}
+
 type PinMessage struct {
 	Msg    string `json:"msg"`
 	Author string `json:"author"`

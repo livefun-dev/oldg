@@ -5,11 +5,13 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"time"
 
+	twitch "github.com/gempir/go-twitch-irc/v3"
 	"github.com/lifevun-dev/oldg/graph/generated"
 	"github.com/lifevun-dev/oldg/graph/model"
+	"github.com/sirupsen/logrus"
 )
 
 func (r *mutationResolver) PinMessage(ctx context.Context, msg string, author string) (bool, error) {
@@ -54,6 +56,35 @@ func (r *subscriptionResolver) Commands(ctx context.Context) (<-chan model.Comma
 	return obs.msgChan, nil
 }
 
+func (r *subscriptionResolver) TwitchChat(ctx context.Context, channel string) (<-chan *model.ChatMessage, error) {
+	client := twitch.NewAnonymousClient()
+	c := make(chan *model.ChatMessage, 1)
+	client.OnPrivateMessage(func(msg twitch.PrivateMessage) {
+		c <- &model.ChatMessage{
+			Msg:    msg.Message,
+			Author: msg.User.DisplayName,
+		}
+	})
+	client.Join(channel)
+
+	go func() {
+		<-ctx.Done()
+		client.Disconnect()
+		close(c)
+		logrus.Infof("client disconnected: %v", channel)
+	}()
+
+	go func() {
+		err := client.Connect()
+		if err != nil && !errors.Is(twitch.ErrClientDisconnected, err) {
+			close(c)
+			logrus.Errorf("error on channel %v: %v", channel, err)
+		}
+	}()
+
+	return c, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -66,30 +97,3 @@ func (r *Resolver) Subscription() generated.SubscriptionResolver { return &subsc
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-type Observer struct {
-	msgChan chan model.Command
-}
-
-var observers map[string]Observer = map[string]Observer{}
-
-func (r *subscriptionResolver) NewMessage(ctx context.Context) (<-chan string, error) {
-	msgChan := make(chan string, 10)
-
-	go func() {
-		cnt := 0
-		for {
-			msgChan <- fmt.Sprintf("msg: %d", cnt)
-			cnt += 1
-			time.Sleep(2 * time.Second)
-		}
-	}()
-
-	return msgChan, nil
-}

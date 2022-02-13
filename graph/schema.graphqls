@@ -13,6 +13,12 @@ type Mutation {
 
 type Subscription {
   commands: Command!
+  twitchChat(channel: String!): ChatMessage!
+}
+
+type ChatMessage {
+  msg: String!
+  author: String!
 }
 
 type PinMessage {
