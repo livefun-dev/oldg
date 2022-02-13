@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+  name: oldg
+  namespace: oldg
+spec:
+  rules:
+    - host: olg.dev.ludusrusso.space
+      http:
+        paths:
+          - backend:
+              serviceName: oldg
+              servicePort: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - olg.dev.ludusrusso.space
+      secretName: olg.dev.ludusrusso.space-tls

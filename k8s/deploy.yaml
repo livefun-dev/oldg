@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: oldg
+  name: oldg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oldg
+  template:
+    metadata:
+      labels:
+        app: oldg
+    spec:
+      containers:
+        - image: ghcr.io/livefun-dev/oldg:9a80f4c1add64542149b2028c35690c64437acb9
+          name: oldg
+          ports:
+            - containerPort: 8080
+              name: gql
